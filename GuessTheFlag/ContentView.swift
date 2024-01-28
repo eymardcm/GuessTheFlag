@@ -17,6 +17,10 @@ struct ContentView: View {
     @State private var scoreTitle = ""
     @State private var scoreMessage = ""
     
+    @State private var showingEnd = false
+    @State private var endTitle = ""
+    @State private var endMessage = ""
+    
     @State private var correct: Int = 0
     @State private var incorrect: Int = 0
     
@@ -73,7 +77,19 @@ struct ContentView: View {
         } message: {
             Text(scoreMessage)
         }
-        
+        .alert(endTitle, isPresented: $showingEnd) {
+            Button("Play again", action: reset)
+        } message: {
+            Text(endMessage)
+        }
+    }
+    
+    func isGameOver() -> Bool {
+        print("Correct: \(correct), Incorrect: \(incorrect)")
+        if ((correct + incorrect) == 8) {
+            return true
+        }
+        return false
     }
     
     func flagTapped(_ number: Int) {
@@ -89,11 +105,29 @@ struct ContentView: View {
         }
         
         showingScore = true
+        
+        if(isGameOver()) {
+            showingEnd = true
+            endTitle = "Game Over"
+            endMessage = """
+                         Correct: \(correct)
+                         Incorrect: \(incorrect)
+                         """
+        }
+        
+    }
+    
+    func reset() {
+        correct = 0
+        incorrect = 0
+        askQuestion()
     }
     
     func askQuestion() {
-        countries.shuffle()
-        correctAnswer = Int.random(in: 0...2)
+        if (!isGameOver()) {
+            countries.shuffle()
+            correctAnswer = Int.random(in: 0...2)
+        }
     }
 }
 
